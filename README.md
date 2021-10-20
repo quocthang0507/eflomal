@@ -54,7 +54,9 @@ details.
 
 When used with the `-s` and `-t` options for separate source/target files, the
 `align.py` interface expects one sentence per line with space-separated
-tokens, similar to most word alignment software.
+tokens (value `0`) or Vietnamese-based tokens (value `1` if you would like to 
+use PyVi tokenizer or `2` to use underthesea tokenizer) (used for `-c` option), 
+similar to most word alignment software.
 
 The `-i` option assumes a `fast_text` style joint source/target file of the
 format

@@ -65,6 +65,9 @@ def main():
         '-i', '--input', dest='joint_filename', type=str, metavar='filename',
         help='fast_align style ||| separated file')
     parser.add_argument(
+        '-c', '--custom-tokenizer', dest='tokenizer', default=0, type=int, metavar='N',
+        help='Word tokenizer (0 = Whitespace, 1 = PyVi tokenizer, 2 = Underthesea tokenizer)')
+    parser.add_argument(
         '-f', '--forward-links', dest='links_filename_fwd', type=str,
         metavar='filename',
         help='Filename to write forward direction alignments to')
@@ -180,7 +183,7 @@ def main():
 
         with io.StringIO(src_text) as f:
             src_sents, src_index = read_text(
-                    f, True, args.source_prefix_len, args.source_suffix_len)
+                    f, True, args.source_prefix_len, args.source_suffix_len, args.tokenizer)
             n_src_sents = len(src_sents)
             src_voc_size = len(src_index)
             srcf = NamedTemporaryFile('wb')
@@ -190,7 +193,7 @@ def main():
 
         with io.StringIO(trg_text) as f:
             trg_sents, trg_index = read_text(
-                    f, True, args.target_prefix_len, args.target_suffix_len)
+                    f, True, args.target_prefix_len, args.target_suffix_len, args.tokenizer)
             trg_voc_size = len(trg_index)
             n_trg_sents = len(trg_sents)
             trgf = NamedTemporaryFile('wb')
@@ -204,7 +207,7 @@ def main():
                   file=sys.stderr, flush=True)
         with open(args.source_filename, 'r', encoding='utf-8') as f:
             src_sents, src_index = read_text(
-                    f, True, args.source_prefix_len, args.source_suffix_len)
+                    f, True, args.source_prefix_len, args.source_suffix_len, args.tokenizer)
             n_src_sents = len(src_sents)
             src_voc_size = len(src_index)
             srcf = NamedTemporaryFile('wb')
@@ -216,7 +219,7 @@ def main():
                   file=sys.stderr, flush=True)
         with open(args.target_filename, 'r', encoding='utf-8') as f:
             trg_sents, trg_index = read_text(
-                    f, True, args.target_prefix_len, args.target_suffix_len)
+                    f, True, args.target_prefix_len, args.target_suffix_len, args.tokenizer)
             trg_voc_size = len(trg_index)
             n_trg_sents = len(trg_sents)
             trgf = NamedTemporaryFile('wb')
