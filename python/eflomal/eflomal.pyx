@@ -15,7 +15,7 @@ from underthesea import word_tokenize
 
 
 def pyvi_tokenize(str text):
-    return [i.replace('_', ' ') for i in ViTokenizer.tokenize(text).split()]
+    return [i.replace('_', ' ') for i in ViTokenizer.tokenize(text.strip()).split()]
 
 
 cpdef tuple read_text(pyfile, bool lowercase, int prefix_len, int suffix_len, int tokenizer = 0):
