@@ -14,8 +14,16 @@ from pyvi import ViTokenizer
 from underthesea import word_tokenize
 
 
+def ignore_spec_chars(str text):
+    '''Loại bỏ các ký tự không cần thiết
+    '''
+    skip_chars = ['-', ':', ',', '.', '(', ')', '"', '/']
+    return ''.join([c for c in text if c not in skip_chars and not c.isdigit()])
+
+
 def pyvi_tokenize(str text):
-    return [i.replace('_', ' ') for i in ViTokenizer.tokenize(text.strip()).split()]
+    text = ignore_spec_chars(text).strip()
+    return [i.replace('_', ' ') for i in ViTokenizer.tokenize(text).split()]
 
 
 cpdef tuple read_text(pyfile, bool lowercase, int prefix_len, int suffix_len, int tokenizer = 0):
