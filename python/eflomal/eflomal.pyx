@@ -10,9 +10,15 @@ import subprocess
 from tempfile import NamedTemporaryFile
 
 import numpy as np
+from pyvi import ViTokenizer
+from underthesea import word_tokenize
 
 
-cpdef tuple read_text(pyfile, bool lowercase, int prefix_len, int suffix_len):
+def pyvi_tokenize(str text):
+    return [i.replace('_', ' ') for i in ViTokenizer.tokenize(text).split()]
+
+
+cpdef tuple read_text(pyfile, bool lowercase, int prefix_len, int suffix_len, int tokenizer = 0):
     """Read a tokenized text file as a list of indexed sentences.
     
     Optionally transform the vocabulary according to the parameters.
@@ -21,6 +27,7 @@ cpdef tuple read_text(pyfile, bool lowercase, int prefix_len, int suffix_len):
     lowercase -- if True, all tokens are lowercased
     prefix_len -- if non-zero, all tokens are cut of after so many characters
     suffix_len -- if non-zero, as above, but cutting from the right side
+    tokenizer -- 0 if using default tokenizer (WhiteSpace tokenizer), 1 if using PyVi or 2 if using Underthesea
 
     Returns:
     a tuple (list sents, dict index) containing the actual sentences and the
@@ -36,10 +43,21 @@ cpdef tuple read_text(pyfile, bool lowercase, int prefix_len, int suffix_len):
     index = {}
     sents = []
     for line in pyfile:
-        if lowercase:
-            tokens = line.lower().split()
-        else:
-            tokens = line.split()
+        if tokenizer == 0:
+            if lowercase:
+                tokens = line.lower().split()
+            else:
+                tokens = line.split()
+        elif tokenizer == 1:
+            if lowercase:
+                tokens = pyvi_tokenize(line.lower())
+            else:
+                tokens = pyvi_tokenize(line)
+        elif tokenizer == 2:
+            if lowercase:
+                tokens = word_tokenize(line.lower())
+            else:
+                tokens = word_tokenize(line)
         n = len(tokens)
         sent = np.empty(n, dtype=np.uint32)
 
