@@ -13,7 +13,7 @@ setup(
     author='Robert Östling',
     url='https://github.com/robertostling/eflomal',
     license='GNU GPLv3',
-    install_requires=['numpy', 'pyvi', 'underthesea'],
+    install_requires=['numpy', 'huggingface-hub', 'pyvi', 'underthesea'],
     ext_modules=cythonize(cyalign_ext)
 )
 
