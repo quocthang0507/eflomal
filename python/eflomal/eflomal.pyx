@@ -14,17 +14,29 @@ from pyvi import ViTokenizer
 from underthesea import word_tokenize
 
 
-def ignore_spec_chars(text: str):
+def ignore_spec_chars(str text):
     '''Loại bỏ các ký tự không cần thiết
     '''
-    skip_chars = ['-', ':', ',', '.', '#', '+', ';', '<', '>', "'",
+    skip_chars = ['-', ':', ',', '.', '+', ';', '<', '>', "'",
                   '(', ')', '"', '/', '‰', '%', '…', '‘', '–']
     return ''.join([c for c in text if c not in skip_chars and not c.isdigit()])
 
 
-def pyvi_tokenize(str text):
-    text = ignore_spec_chars(text).strip()
-    return [i.replace('_', ' ') for i in ViTokenizer.tokenize(text).split()]
+def pyvi_tokenize(str sentence, bool lower = True):
+    if lower:
+        sentence = sentence.lower()
+    # Bỏ qua các ký tự không cần thiết
+    sentence = ignore_spec_chars(sentence).strip()
+    # Đưa các ký tự sau vào token trước nó #, |, \, $
+    keeping_chars = ['#', '|', '\\', '$']
+    tokens = [i.replace('_', ' ')
+              for i in ViTokenizer.tokenize(sentence).split()]
+    for idx, token in enumerate(tokens):
+        if token in keeping_chars and idx > 0:
+            tokens[idx-1] += tokens[idx]
+    # Xoá các ký nằm riêng đó
+    tokens = [token for token in tokens if token not in keeping_chars]
+    return tokens
 
 
 cpdef tuple read_text(pyfile, bool lowercase, int prefix_len, int suffix_len, int tokenizer = 0):
