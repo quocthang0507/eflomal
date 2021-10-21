@@ -17,7 +17,7 @@ from underthesea import word_tokenize
 def ignore_spec_chars(text: str):
     '''Loại bỏ các ký tự không cần thiết
     '''
-    skip_chars = ['-', ':', ',', '.',
+    skip_chars = ['-', ':', ',', '.', '#', '+', ';', '<', '>', "'",
                   '(', ')', '"', '/', '‰', '%', '…', '‘', '–']
     return ''.join([c for c in text if c not in skip_chars and not c.isdigit()])
 
