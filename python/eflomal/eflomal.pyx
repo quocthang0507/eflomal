@@ -22,20 +22,57 @@ def ignore_spec_chars(str text):
     return ''.join([c for c in text if c not in skip_chars and not c.isdigit()])
 
 
-def pyvi_tokenize(str sentence, bool lower = True):
+def tnkey_to_unicode(str text):
+    '''Chuyển một vài ký tự đặc biệt trong font TNKey sang Unicode'''
+    if not text:
+        return ''
+    list_chars = [('[', 'ƀ'), ('_', 'Ƀ'), ('}', 'Č'), (']', 'č'),
+                  ('E|', 'Ĕ'), ('e\\', 'ĕ'), ('I|', 'Ĭ'), ('i\\', 'ĭ'),
+                  ('~', 'Ñ'), ('`', 'ñ'), ('O|', 'Ŏ'), ('o\\', 'ŏ'),
+                  ('U|', 'Ŭ'), ('u\\', 'ŭ'), ('^', 'ĭ'), ('A|', 'Ă'),
+                  ('a\\', 'ă'), ('  ', ' '), ('‘', '\'')]
+    for c in list_chars:
+        text = text.replace(c[0], c[1])
+    return text.strip()
+
+
+def replace_or_recover_spec_kho_chars(str text, bool recover = False):
+    '''Thay thế một số ký tự đặc thù của K'Ho và khôi phục lại trạng thái'''
+    if not text:
+        return ''
+    spec_chars = [('a#', 'ȁ'), ('e#', 'ȅ'), ('o#', 'ȍ'),
+                  ('A$', 'Ȁ'), ('E$', 'Ȅ'), ('O$', 'Ȍ'),
+                  ('ơ\\', 'ō'), ('ư\\', 'ū'), ('Ơ|', 'Ō'), ('Ư|', 'Ū')]
+    if recover:
+        fid = 1
+        rid = 0
+    else:
+        fid = 0
+        rid = 1
+    for c in spec_chars:
+        text = text.replace(c[fid], c[rid])
+    return text
+
+
+def tokenize(str sentence, bool lower = True, bool tnkey_to_unicode = False, int tokenizer_id = 1):
+    '''Tách (các) câu thành các từ/cụm từ dựa trên khoảng trắng (0), pyvi (1) hoặc underthesea (2)'''
     if lower:
         sentence = sentence.lower()
+    if tnkey_to_unicode:
+        sentence = tnkey_to_unicode(sentence)
+
     # Bỏ qua các ký tự không cần thiết
     sentence = ignore_spec_chars(sentence).strip()
-    # Đưa các ký tự sau vào token trước nó #, |, \, $
-    keeping_chars = ['#', '|', '\\', '$']
-    tokens = [i.replace('_', ' ')
-              for i in ViTokenizer.tokenize(sentence).split()]
-    for idx, token in enumerate(tokens):
-        if token in keeping_chars and idx > 0:
-            tokens[idx-1] += tokens[idx]
-    # Xoá các ký nằm riêng đó
-    tokens = [token for token in tokens if token not in keeping_chars]
+    sentence = replace_or_recover_spec_kho_chars(sentence)
+    if tokenizer_id == 0:
+        tokens = sentence.split()
+    elif tokenizer_id == 1:
+        tokens = [i.replace('_', ' ')
+                for i in ViTokenizer.tokenize(sentence).split()]
+    elif tokenizer_id == 2:
+        tokens = word_tokenize(sentence)
+    
+    tokens = [replace_or_recover_spec_kho_chars(token, True) for token in tokens]
     return tokens
 
 
@@ -64,21 +101,7 @@ cpdef tuple read_text(pyfile, bool lowercase, int prefix_len, int suffix_len, in
     index = {}
     sents = []
     for line in pyfile:
-        if tokenizer == 0:
-            if lowercase:
-                tokens = line.lower().split()
-            else:
-                tokens = line.split()
-        elif tokenizer == 1:
-            if lowercase:
-                tokens = pyvi_tokenize(line.lower())
-            else:
-                tokens = pyvi_tokenize(line)
-        elif tokenizer == 2:
-            if lowercase:
-                tokens = word_tokenize(line.lower())
-            else:
-                tokens = word_tokenize(line)
+        tokens = tokenize(line, lowercase, False, tokenizer)
         n = len(tokens)
         sent = np.empty(n, dtype=np.uint32)
 
