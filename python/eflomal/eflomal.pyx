@@ -30,7 +30,9 @@ def tnkey_to_unicode(str text):
                   ('E|', 'Ĕ'), ('e\\', 'ĕ'), ('I|', 'Ĭ'), ('i\\', 'ĭ'),
                   ('~', 'Ñ'), ('`', 'ñ'), ('O|', 'Ŏ'), ('o\\', 'ŏ'),
                   ('U|', 'Ŭ'), ('u\\', 'ŭ'), ('^', 'ĭ'), ('A|', 'Ă'),
-                  ('a\\', 'ă'), ('  ', ' '), ('‘', '\'')]
+                  ('a\\', 'ă'), ('  ', ' '), ('‘', '\''), ('ǐ', 'ĭ'),
+                  ('Ǐ', 'Ĭ'), ('ǒ', 'ŏ'), ('Ǒ', 'Ŏ'), ('ǔ', 'ŭ'),
+                  ('Ǔ', 'Ŭ')]
     for c in list_chars:
         text = text.replace(c[0], c[1])
     return text.strip()
@@ -54,11 +56,11 @@ def replace_or_recover_spec_kho_chars(str text, bool recover = False):
     return text
 
 
-def tokenize(str sentence, bool lower = True, bool tnkey_to_unicode = False, int tokenizer_id = 1):
+def tokenize(str sentence, bool lower = True, bool tn_to_unicode = True, int tokenizer_id = 1):
     '''Tách (các) câu thành các từ/cụm từ dựa trên khoảng trắng (0), pyvi (1) hoặc underthesea (2)'''
     if lower:
         sentence = sentence.lower()
-    if tnkey_to_unicode:
+    if tn_to_unicode:
         sentence = tnkey_to_unicode(sentence)
 
     # Bỏ qua các ký tự không cần thiết
