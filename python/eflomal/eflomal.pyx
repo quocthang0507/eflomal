@@ -103,7 +103,7 @@ cpdef tuple read_text(pyfile, bool lowercase, int prefix_len, int suffix_len, in
     index = {}
     sents = []
     for line in pyfile:
-        tokens = tokenize(line, lowercase, False, tokenizer)
+        tokens = tokenize(line, lowercase, True, tokenizer)
         n = len(tokens)
         sent = np.empty(n, dtype=np.uint32)
 
