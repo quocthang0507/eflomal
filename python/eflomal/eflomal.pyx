@@ -65,7 +65,7 @@ def tokenize(str sentence, bool lower = True, bool tn_to_unicode = True, int tok
 
     # Bỏ qua các ký tự không cần thiết
     sentence = ignore_spec_chars(sentence).strip()
-    sentence = replace_or_recover_spec_kho_chars(sentence)
+    sentence = replace_or_recover_spec_kho_chars(sentence, False)
     if tokenizer_id == 0:
         tokens = sentence.split()
     elif tokenizer_id == 1:
